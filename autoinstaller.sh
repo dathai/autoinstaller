@@ -353,7 +353,7 @@ uninstall_shadowsocks_libev(){
 install_monit(){
     clear
 	apt-get install monit
-	~/autoinstaller/monitrc mv /etc/monit/monitrc
+	mv ~/autoinstaller/monitrc /etc/monit/monitrc
 	monit
 }
 # Install openvpn
@@ -370,42 +370,19 @@ install_openvpn(){
 	sudo cp ca.crt ca.key server.crt server.key ta.key dh2048.pem /etc/openvpn
 	mv ~/autoinstaller/server.conf /etc/openvpn/
 	mv ~/autoinstaller/server-udp.conf /etc/openvpn/
-		# Enable net.ipv4.ip_forward for the system
-	sed -i '/\<net.ipv4.ip_forward\>/c\net.ipv4.ip_forward=1' /etc/sysctl.conf
-	if ! grep -q "\<net.ipv4.ip_forward\>" /etc/sysctl.conf; then
-		echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
-	fi
-	sudo sysctl -p
+	# Error PLEASE MANUAL Config
 	# enable ufw
-	echo '# START OPENVPN RULES' >> /etc/ufw/before.rules
-	echo '# NAT table rules' >> /etc/ufw/before.rules
-	echo '*nat' >> /etc/ufw/before.rules
-	echo ':POSTROUTING ACCEPT [0:0] ' >> /etc/ufw/before.rules
-	echo '# Allow traffic from OpenVPN client to eth0' >> /etc/ufw/before.rules
-	echo '-A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE' >> /etc/ufw/before.rules
-	echo '-A POSTROUTING -s 10.9.0.0/8 -o eth0 -j MASQUERADE' >> /etc/ufw/before.rules
-	echo 'COMMIT' >> /etc/ufw/before.rules
-	echo '# END OPENVPN RULES' >> /etc/ufw/before.rules
-	iptables-save
-	# config ufw
-	sed -i '/\<DEFAULT_FORWARD_POLICY\>/c\DEFAULT_FORWARD_POLICY="ACCEPT"' /etc/default/ufw
-	if ! grep -q "\<DEFAULT_FORWARD_POLICY\>" /etc/default/ufw; then
-		echo 'DEFAULT_FORWARD_POLICY="ACCEPT"' >> /etc/default/ufw
-	fi
-sudo ufw allow OpenSSH
-sudo ufw allow 53/udp
-sudo ufw allow 636/tcp
-sudo ufw allow 443/tcp
-sudo ufw allow 10000/tcp
-sudo ufw allow 80/tcp
-sudo ufw allow 8080/tcp
-sudo ufw allow 3128/tcp
-sudo ufw allow 8757/udp
-sudo ufw allow 143/tcp
-sudo ufw allow 8530/tcp
-sudo ufw allow 2812/tcp
-sudo ufw disable
-sudo ufw enable
+	# # echo '# START OPENVPN RULES' >> /etc/ufw/before.rules
+	# echo '# NAT table rules' >> /etc/ufw/before.rules
+	# echo '*nat' >> /etc/ufw/before.rules
+	# echo ':POSTROUTING ACCEPT [0:0] ' >> /etc/ufw/before.rules
+	# echo '# Allow traffic from OpenVPN client to eth0' >> /etc/ufw/before.rules
+	# echo '-A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE' >> /etc/ufw/before.rules
+	# echo '-A POSTROUTING -s 10.9.0.0/8 -o eth0 -j MASQUERADE' >> /etc/ufw/before.rules
+	# echo 'COMMIT' >> /etc/ufw/before.rules
+	# echo '# END OPENVPN RULES' >> /etc/ufw/before.rules
+	# iptables-save
+	
 sudo systemctl start openvpn@server
 sudo systemctl start openvpn@server-udp
 # automakeconfig
@@ -454,6 +431,36 @@ install_squid(){
 	mv ~/autoinstaller/squid.conf /etc/squid/squid.conf
 	sudo service squid restart
 }
+# install ufw
+install_ufw(){
+    clear
+	sudo apt-get update && apt-get install ufw
+	sudo ufw allow OpenSSH
+	sudo ufw allow 53/udp
+	sudo ufw allow 636/tcp
+	sudo ufw allow 443/tcp
+	sudo ufw allow 10000/tcp
+	sudo ufw allow 80/tcp
+	sudo ufw allow 8080/tcp
+	sudo ufw allow 3128/tcp
+	sudo ufw allow 8757/udp
+	sudo ufw allow 143/tcp
+	sudo ufw allow 8530/tcp
+	sudo ufw allow 2812/tcp
+	# Enable net.ipv4.ip_forward for the system
+	sed -i '/\<net.ipv4.ip_forward\>/c\net.ipv4.ip_forward=1' /etc/sysctl.conf
+	if ! grep -q "\<net.ipv4.ip_forward\>" /etc/sysctl.conf; then
+		echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
+	fi
+	sudo sysctl -p
+	sed -i '/\<DEFAULT_FORWARD_POLICY\>/c\DEFAULT_FORWARD_POLICY="ACCEPT"' /etc/default/ufw
+	if ! grep -q "\<DEFAULT_FORWARD_POLICY\>" /etc/default/ufw; then
+		 echo 'DEFAULT_FORWARD_POLICY="ACCEPT"' >> /etc/default/ufw
+	fi
+	sudo ufw disable
+	sudo ufw enable
+}
+
 # install dropbear
 install_dropbear(){
     clear
@@ -493,24 +500,34 @@ case "$action" in
     install)
     install_shadowsocks_libev
     ;;
+	# fix
 	installmonit)
     install_monit
     ;;
+	# fix but manual config tun for forwarding
 	installopenvpn)
     install_openvpn
     ;;
+	# fix
 	installsquid)
     install_squid
     ;;
+	# fix
 	installsslh)
     install_sslh
     ;;
 	installwebmin)
     install_webmin
     ;;
+	# fix
 	installdropbear)
     install_dropbear
     ;;
+	# fix
+	installufw)
+    install_ufw
+    ;;
+	# fix
 	fasttcp)
     install_fasttcp
     ;;
