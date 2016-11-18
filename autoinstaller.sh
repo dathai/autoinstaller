@@ -370,7 +370,6 @@ install_openvpn(){
 	sudo cp ca.crt ca.key server.crt server.key ta.key dh2048.pem /etc/openvpn
 	mv ~/autoinstaller/server.conf /etc/openvpn/
 	mv ~/autoinstaller/server-udp.conf /etc/openvpn/
-	sudo nano /etc/sysctl.conf
 		# Enable net.ipv4.ip_forward for the system
 	sed -i '/\<net.ipv4.ip_forward\>/c\net.ipv4.ip_forward=1' /etc/sysctl.conf
 	if ! grep -q "\<net.ipv4.ip_forward\>" /etc/sysctl.conf; then
@@ -378,24 +377,22 @@ install_openvpn(){
 	fi
 	sudo sysctl -p
 	# enable ufw
-	sudo nano /etc/ufw/before.rules
-	echo '# START OPENVPN RULES
-	# NAT table rules
-	*nat
-	:POSTROUTING ACCEPT [0:0] 
-	# Allow traffic from OpenVPN client to eth0
-	-A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE
-	-A POSTROUTING -s 10.9.0.0/8 -o eth0 -j MASQUERADE
-	COMMIT
-	# END OPENVPN RULES
-	' >> /etc/ufw/before.rules
+	echo '# START OPENVPN RULES' >> /etc/ufw/before.rules
+	echo '# NAT table rules' >> /etc/ufw/before.rules
+	echo '*nat' >> /etc/ufw/before.rules
+	echo ':POSTROUTING ACCEPT [0:0] ' >> /etc/ufw/before.rules
+	echo '# Allow traffic from OpenVPN client to eth0' >> /etc/ufw/before.rules
+	echo '-A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE' >> /etc/ufw/before.rules
+	echo '-A POSTROUTING -s 10.9.0.0/8 -o eth0 -j MASQUERADE' >> /etc/ufw/before.rules
+	echo 'COMMIT' >> /etc/ufw/before.rules
+	echo '# END OPENVPN RULES' >> /etc/ufw/before.rules
 	iptables-save
 	# config ufw
 	sed -i '/\<DEFAULT_FORWARD_POLICY\>/c\DEFAULT_FORWARD_POLICY="ACCEPT"' /etc/default/ufw
 	if ! grep -q "\<DEFAULT_FORWARD_POLICY\>" /etc/default/ufw; then
 		echo 'DEFAULT_FORWARD_POLICY="ACCEPT"' >> /etc/default/ufw
 	fi
-	sudo ufw allow OpenSSH
+sudo ufw allow OpenSSH
 sudo ufw allow 53/udp
 sudo ufw allow 636/tcp
 sudo ufw allow 443/tcp
