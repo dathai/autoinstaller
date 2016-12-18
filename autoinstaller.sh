@@ -354,6 +354,7 @@ install_monit(){
     clear
 	apt-get install monit
 	mv ~/autoinstaller/monitrc /etc/monit/monitrc
+	chmod 700 /etc/monit/monitrc
 	monit
 }
 # Install openvpn
@@ -466,7 +467,7 @@ install_dropbear(){
     clear
 	apt-get update
 	apt-get install dropbear
-	mv ~/autoinstaller/dropbear.conf /etc/default/dropbear.conf
+	mv ~/autoinstaller/dropbear /etc/default/dropbear
 	/etc/init.d/dropbear restart
 	# limit login
 	sudo iptables -A INPUT -p tcp --syn --dport 143 -m connlimit --connlimit-above 2 -j REJECT
