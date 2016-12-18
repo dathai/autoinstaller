@@ -443,7 +443,7 @@ install_ufw(){
 	sudo ufw allow 80/tcp
 	sudo ufw allow 8080/tcp
 	sudo ufw allow 3128/tcp
-	sudo ufw allow 8757/udp
+	sudo ufw allow 27015/udp
 	sudo ufw allow 143/tcp
 	sudo ufw allow 8530/tcp
 	sudo ufw allow 2812/tcp
