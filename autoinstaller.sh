@@ -448,6 +448,10 @@ install_ufw(){
 	sudo ufw allow 143/tcp
 	sudo ufw allow 8530/tcp
 	sudo ufw allow 2812/tcp
+	sudo ufw allow 67
+	sudo ufw allow 68
+	sudo ufw allow 5353
+	sudo ufw allow 1900
 	# Enable net.ipv4.ip_forward for the system
 	sed -i '/\<net.ipv4.ip_forward\>/c\net.ipv4.ip_forward=1' /etc/sysctl.conf
 	if ! grep -q "\<net.ipv4.ip_forward\>" /etc/sysctl.conf; then
