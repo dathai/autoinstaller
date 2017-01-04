@@ -491,9 +491,34 @@ install_sslh(){
 install_failban(){
     clear
     apt-get -y install fail2ban;service fail2ban restart
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/akun > /usr/bin/akun
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/lmtdb > /usr/bin/lmtdb
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/lmtop > /usr/bin/lmtop
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/login > /usr/bin/login
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/tambah > /usr/bin/tambah
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/addpptp > /usr/bin/addpptp
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/renew > /usr/bin/renew
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/expired.sh > /root/expired.sh
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/lmt.sh > /root/lmt.sh
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/login.sh > /root/login.sh
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/addpptp.sh > /root/addpptp.sh
+    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/cron.sh > /usr/bin/cron.sh
+    wget https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/speedtest_cli.py
+    chmod +x /root/expired.sh
+    chmod +x /root/lmt.sh
+    chmod +x /root/login.sh
+    chmod +x /usr/bin/login
+    chmod +x /usr/bin/tambah
+    chmod +x /usr/bin/akun
+    chmod +x /usr/bin/lmtdb
+    chmod +x /usr/bin/lmtop
+    chmod +x /usr/bin/addpptp
+    chmod +x /usr/bin/renew
+    chmod +x /root/addpptp.sh
+    chmod +x /usr/bin/cron.sh
 }
 # install badvpn
-install_failban(){
+install_badvpn(){
 	clear
 	apt-get -y install cmake make gcc
 	wget https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/file/badvpn-1.999.127.tar.bz2
@@ -548,6 +573,12 @@ case "$action" in
 	# fix
 	installufw)
     install_ufw
+    ;;
+    installfailban)
+    install_failban
+    ;;
+    installbadvpn)
+    install_badvpn
     ;;
 	# fix
 	fasttcp)
