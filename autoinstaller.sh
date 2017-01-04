@@ -487,6 +487,23 @@ install_sslh(){
 	mv ~/autoinstaller/sslh /etc/default/sslh
 	sudo /etc/init.d/sslh restart
 }
+# install failban
+install_failban(){
+    clear
+    apt-get -y install fail2ban;service fail2ban restart
+}
+# install badvpn
+install_failban(){
+	clear
+	apt-get -y install cmake make gcc
+	wget https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/file/badvpn-1.999.127.tar.bz2
+	tar xf badvpn-1.999.127.tar.bz2
+	mkdir badvpn-build
+	cd badvpn-build
+	cmake ~/badvpn-1.999.127 -DBUILD_NOTHING_BY_DEFAULT=1 -DBUILD_UDPGW=1
+	make install
+	screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &
+}
 # install webmin
 install_webmin(){
     clear
