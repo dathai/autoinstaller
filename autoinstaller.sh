@@ -452,6 +452,7 @@ install_ufw(){
 	sudo ufw allow 68
 	sudo ufw allow 5353
 	sudo ufw allow 1900
+	sudo ufw allow 7300
 	# Enable net.ipv4.ip_forward for the system
 	sed -i '/\<net.ipv4.ip_forward\>/c\net.ipv4.ip_forward=1' /etc/sysctl.conf
 	if ! grep -q "\<net.ipv4.ip_forward\>" /etc/sysctl.conf; then
@@ -525,8 +526,9 @@ install_badvpn(){
 	tar xf badvpn-1.999.127.tar.bz2
 	mkdir badvpn-build
 	cd badvpn-build
-	cmake ~/badvpn-1.999.127 -DBUILD_NOTHING_BY_DEFAULT=1 -DBUILD_UDPGW=1
+	cmake ~/autoinstaller/badvpn-1.999.127 -DBUILD_NOTHING_BY_DEFAULT=1 -DBUILD_UDPGW=1
 	make install
+	echo "$ screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &" >> /etc/rc.local
 	screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &
 }
 # install webmin
