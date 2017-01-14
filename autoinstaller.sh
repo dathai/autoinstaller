@@ -397,40 +397,57 @@ chmod 700 ~/client-configs/make_config.sh
 # advanced shadowsocks
 install_fasttcp(){
     clear
-   	echo 3 > /proc/sys/net/ipv4/tcp_fastopen
-	echo '/etc/init.d/shadowsocks start' >> /etc/rc.local
-	sudo systemctl status rc-local.service
-	echo '* soft nofile 51200' >> /etc/limits.conf
-	echo '* soft nofile 51200' >> /etc/limits.conf
-	ulimit -n 51200
-	echo 'fs.file-max = 51200' >>/etc/sysctl.conf
-	echo 'net.core.rmem_max = 67108864' >>/etc/sysctl.conf
-	echo 'net.core.wmem_max = 67108864' >>/etc/sysctl.conf
-	echo 'net.core.netdev_max_backlog = 250000' >>/etc/sysctl.conf
-	echo 'net.core.somaxconn = 4096' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_syncookies = 1' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_tw_reuse = 1' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_tw_recycle = 0' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_fin_timeout = 30' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_keepalive_time = 1200' >>/etc/sysctl.conf
-	echo 'net.ipv4.ip_local_port_range = 10000 65000' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_max_syn_backlog = 8192' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_max_tw_buckets = 5000' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_fastopen = 3' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_mem = 25600 51200 102400' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_rmem = 4096 87380 67108864' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_wmem = 4096 65536 67108864' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_mtu_probing = 1' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_congestion_control = cubic' >>/etc/sysctl.conf
+echo "3" > /proc/sys/net/ipv4/tcp_fastopen
+echo "net.ipv4.tcp_fastopen=3" > /etc/sysctl.d/30-tcp_fastopen.conf
+	echo '* soft nofile 51200' >> /etc/security/limits.conf
+	echo '* hard nofile 51200' >> /etc/security/limits.conf
+echo '* hard nproc 2' >> /etc/security/limits.conf
+echo '* hard maxlogins 2' >> /etc/security/limits.conf
+echo 'net.ipv4.ip_forward = 1' >>/etc/sysctl.conf
+echo 'net.ipv4.conf.default.rp_filter = 1' >>/etc/sysctl.conf
+echo 'net.ipv4.conf.default.accept_source_route = 0' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_syncookies = 1' >>/etc/sysctl.conf
+echo 'kernel.msgmnb = 65536' >>/etc/sysctl.conf
+echo 'kernel.msgmax = 65536' >>/etc/sysctl.conf
+echo 'kernel.shmmax = 4294967295' >>/etc/sysctl.conf
+echo 'kernel.shmall = 268435456' >>/etc/sysctl.conf
+echo 'fs.file-max = 51200' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_tw_reuse = 1' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_tw_recycle = 0' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_fin_timeout = 15' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_keepalive_time = 1200' >>/etc/sysctl.conf
+echo 'net.ipv4.ip_local_port_range = 10000 65000' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_max_syn_backlog = 10240' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_max_tw_buckets = 5000' >>/etc/sysctl.conf
+echo 'net.core.rmem_max = 67108864' >>/etc/sysctl.conf
+echo 'net.core.wmem_max = 67108864' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_mem = 25600 51200 102400' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_rmem = 4096 87380 67108864' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_wmem = 4096 65536 67108864' >>/etc/sysctl.conf
+echo 'net.core.netdev_max_backlog = 30000' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_mtu_probing=1' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_fastopen=3' >>/etc/sysctl.conf
+echo 'net.ipv4.tcp_congestion_control=hybla' >>/etc/sysctl.conf
 	sysctl -p
-	
+	ulimit -n 51200
+	cat /etc/sysctl.d/30-tcp_fastopen.conf
+	/sbin/modprobe tcp_hybla
+	sysctl net.ipv4.tcp_available_congestion_control
+	sysctl net.ipv4.tcp_fastopen
+	sed -i '/\<DEFAULT_FORWARD_POLICY\>/c\DEFAULT_FORWARD_POLICY="ACCEPT"' /etc/default/ufw
+	if ! grep -q "\<DEFAULT_FORWARD_POLICY\>" /etc/default/ufw; then
+		 echo 'DEFAULT_FORWARD_POLICY="ACCEPT"' >> /etc/default/ufw
+	fi
+	ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+	clear
+
 }
 # install squid
 install_squid(){
     clear
 	apt-get install squid
 	apt-get install squid3
-	mv ~/autoinstaller/squid.conf /etc/squid/squid.conf
+	mv ~/autoinstaller/squid.conf /etc/squid3/squid.conf
 	sudo service squid restart
 }
 # install ufw
@@ -454,16 +471,6 @@ install_ufw(){
 	sudo ufw allow 5353
 	sudo ufw allow 1900
 	sudo ufw allow 7300
-	# Enable net.ipv4.ip_forward for the system
-	sed -i '/\<net.ipv4.ip_forward\>/c\net.ipv4.ip_forward=1' /etc/sysctl.conf
-	if ! grep -q "\<net.ipv4.ip_forward\>" /etc/sysctl.conf; then
-		echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
-	fi
-	sudo sysctl -p
-	sed -i '/\<DEFAULT_FORWARD_POLICY\>/c\DEFAULT_FORWARD_POLICY="ACCEPT"' /etc/default/ufw
-	if ! grep -q "\<DEFAULT_FORWARD_POLICY\>" /etc/default/ufw; then
-		 echo 'DEFAULT_FORWARD_POLICY="ACCEPT"' >> /etc/default/ufw
-	fi
 	sudo ufw disable
 	sudo ufw enable
 }
@@ -475,11 +482,12 @@ install_dropbear(){
 	apt-get install dropbear
 	mv ~/autoinstaller/dropbear /etc/default/dropbear
 	/etc/init.d/dropbear restart
+	service dropbear restart
 	# limit login
-	sudo iptables -A INPUT -p tcp --syn --dport 143 -m connlimit --connlimit-above 2 -j REJECT
-	sudo iptables -A INPUT -p tcp --syn --dport 443 -m connlimit --connlimit-above 2 -j REJECT
-	sudo iptables -A INPUT -p tcp --syn --dport 80 -m connlimit --connlimit-above 2 -j REJECT 
-	sudo iptables-save
+	# sudo iptables -A INPUT -p tcp --syn --dport 143 -m connlimit --connlimit-above 2 -j REJECT
+	# sudo iptables -A INPUT -p tcp --syn --dport 443 -m connlimit --connlimit-above 2 -j REJECT
+	# sudo iptables -A INPUT -p tcp --syn --dport 80 -m connlimit --connlimit-above 2 -j REJECT 
+	# sudo iptables-save
 }
 # install sslh
 install_sslh(){
@@ -493,31 +501,8 @@ install_sslh(){
 install_failban(){
     clear
     apt-get -y install fail2ban;service fail2ban restart
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/akun > /usr/bin/akun
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/lmtdb > /usr/bin/lmtdb
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/lmtop > /usr/bin/lmtop
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/login > /usr/bin/login
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/tambah > /usr/bin/tambah
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/addpptp > /usr/bin/addpptp
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/renew > /usr/bin/renew
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/expired.sh > /root/expired.sh
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/lmt.sh > /root/lmt.sh
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/login.sh > /root/login.sh
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/addpptp.sh > /root/addpptp.sh
-    curl -s https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/cron.sh > /usr/bin/cron.sh
-    wget https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/speedtest_cli.py
-    chmod +x /root/expired.sh
-    chmod +x /root/lmt.sh
-    chmod +x /root/login.sh
-    chmod +x /usr/bin/login
-    chmod +x /usr/bin/tambah
-    chmod +x /usr/bin/akun
-    chmod +x /usr/bin/lmtdb
-    chmod +x /usr/bin/lmtop
-    chmod +x /usr/bin/addpptp
-    chmod +x /usr/bin/renew
-    chmod +x /root/addpptp.sh
-    chmod +x /usr/bin/cron.sh
+	cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+	service fail2ban restart
 }
 # install badvpn
 install_badvpn(){
@@ -529,7 +514,7 @@ install_badvpn(){
 	cd badvpn-build
 	cmake ~/autoinstaller/badvpn-1.999.127 -DBUILD_NOTHING_BY_DEFAULT=1 -DBUILD_UDPGW=1
 	make install
-	echo "$ screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &" >> /etc/rc.local
+	echo "screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &" >> /etc/rc.local
 	screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &
 }
 # install webmin
