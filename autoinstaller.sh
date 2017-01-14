@@ -397,6 +397,7 @@ chmod 700 ~/client-configs/make_config.sh
 # advanced shadowsocks
 install_fasttcp(){
     clear
+   	echo 3 > /proc/sys/net/ipv4/tcp_fastopen
 	echo '/etc/init.d/shadowsocks start' >> /etc/rc.local
 	sudo systemctl status rc-local.service
 	echo '* soft nofile 51200' >> /etc/limits.conf
@@ -420,7 +421,7 @@ install_fasttcp(){
 	echo 'net.ipv4.tcp_rmem = 4096 87380 67108864' >>/etc/sysctl.conf
 	echo 'net.ipv4.tcp_wmem = 4096 65536 67108864' >>/etc/sysctl.conf
 	echo 'net.ipv4.tcp_mtu_probing = 1' >>/etc/sysctl.conf
-	echo 'net.ipv4.tcp_congestion_control = hybla' >>/etc/sysctl.conf
+	echo 'net.ipv4.tcp_congestion_control = cubic' >>/etc/sysctl.conf
 	sysctl -p
 	
 }
