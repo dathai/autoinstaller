@@ -440,6 +440,7 @@ echo 'net.ipv4.tcp_congestion_control=hybla' >>/etc/sysctl.conf
 	fi
 	ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 	mv ~/autoinstaller/issue.net /etc/issue.net
+	cp /etc/issue.net /etc/issue
 	clear
 
 }
