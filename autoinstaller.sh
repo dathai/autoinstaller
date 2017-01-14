@@ -439,6 +439,7 @@ echo 'net.ipv4.tcp_congestion_control=hybla' >>/etc/sysctl.conf
 		 echo 'DEFAULT_FORWARD_POLICY="ACCEPT"' >> /etc/default/ufw
 	fi
 	ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+	mv ~/autoinstaller/issue.net /etc/issue.net
 	clear
 
 }
@@ -448,7 +449,7 @@ install_squid(){
 	apt-get install squid
 	apt-get install squid3
 	mv ~/autoinstaller/squid.conf /etc/squid3/squid.conf
-	sudo service squid restart
+	sudo service squid3 restart
 }
 # install ufw
 install_ufw(){
