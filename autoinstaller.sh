@@ -440,7 +440,6 @@ echo 'net.ipv4.tcp_congestion_control=hybla' >>/etc/sysctl.conf
 	fi
 	ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 	mv ~/autoinstaller/issue.net /etc/issue.net
-	cp /etc/issue.net /etc/issue
 	clear
 
 }
@@ -451,6 +450,7 @@ install_squid(){
 	apt-get install squid3
 	mv ~/autoinstaller/squid.conf /etc/squid3/squid.conf
 	sudo service squid3 restart
+	clear
 }
 # install ufw
 install_ufw(){
@@ -475,6 +475,25 @@ install_ufw(){
 	sudo ufw allow 7300
 	sudo ufw disable
 	sudo ufw enable
+iptables -N SSHATTACK
+iptables -A SSHATTACK -j LOG --log-prefix "Possible SSH attack! " --log-level 7
+iptables -A SSHATTACK -j DROP
+iptables -A INPUT -i eth0 -p tcp -m state --dport 22 --state NEW -m recent --set
+iptables -A INPUT -i eth0 -p tcp -m state --dport 80 --state NEW -m recent --set
+iptables -A INPUT -i eth0 -p tcp -m state --dport 143 --state NEW -m recent --set
+iptables -A INPUT -i eth0 -p tcp -m state --dport 443 --state NEW -m recent --set
+iptables -A INPUT -i eth0 -p tcp -m state --dport 22 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
+iptables -A INPUT -i eth0 -p tcp -m state --dport 80 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
+iptables -A INPUT -i eth0 -p tcp -m state --dport 143 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
+iptables -A INPUT -i eth0 -p tcp -m state --dport 443 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
+iptables -t filter -I INPUT -p tcp --syn --dport 80 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
+iptables -t filter -I INPUT -p tcp --syn --dport 22 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
+iptables -t filter -I INPUT -p tcp --syn --dport 143 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
+iptables -t filter -I INPUT -p tcp --syn --dport 443 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
+iptables-save
+sudo apt-get install iptables-persistent
+sudo invoke-rc.d iptables-persistent save
+clear
 }
 
 # install dropbear
@@ -483,13 +502,13 @@ install_dropbear(){
 	apt-get update
 	apt-get install dropbear
 	mv ~/autoinstaller/dropbear /etc/default/dropbear
+	echo "/bin/false" >> /etc/shells
+	echo "/usr/sbin/nologin" >> /etc/shells
 	/etc/init.d/dropbear restart
 	service dropbear restart
-	# limit login
-	# sudo iptables -A INPUT -p tcp --syn --dport 143 -m connlimit --connlimit-above 2 -j REJECT
-	# sudo iptables -A INPUT -p tcp --syn --dport 443 -m connlimit --connlimit-above 2 -j REJECT
-	# sudo iptables -A INPUT -p tcp --syn --dport 80 -m connlimit --connlimit-above 2 -j REJECT 
-	# sudo iptables-save
+	echo 'MaxAuthTries 2' >>/etc/ssh/sshd_config
+	echo 'Banner /etc/issue.net' >>/etc/ssh/sshd_config
+	
 }
 # install sslh
 install_sslh(){
@@ -498,6 +517,7 @@ install_sslh(){
 	sudo apt-get install sslh
 	mv ~/autoinstaller/sslh /etc/default/sslh
 	sudo /etc/init.d/sslh restart
+	clear
 }
 # install failban
 install_failban(){
@@ -505,6 +525,7 @@ install_failban(){
     apt-get -y install fail2ban;service fail2ban restart
 	cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 	service fail2ban restart
+	clear
 }
 # install badvpn
 install_badvpn(){
@@ -516,8 +537,15 @@ install_badvpn(){
 	cd badvpn-build
 	cmake ~/autoinstaller/badvpn-1.999.127 -DBUILD_NOTHING_BY_DEFAULT=1 -DBUILD_UDPGW=1
 	make install
-	echo "screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &" >> /etc/rc.local
+	echo 'screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &' >> /etc/rc.local
+	echo 'service fail2ban restart' >> /etc/rc.local
+	echo 'sudo /etc/init.d/sslh restart' >> /etc/rc.local
+	echo 'service dropbear restart' >> /etc/rc.local
+	echo 'sudo service squid3 restart' >> /etc/rc.local
+	echo 'service iptables-persistent start' >> /etc/rc.local
+	echo '/etc/init.d/dropbear restart' >> /etc/rc.local
 	screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &
+	clear
 }
 # install webmin
 install_webmin(){
