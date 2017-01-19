@@ -468,6 +468,7 @@ install_ufw(){
 	sudo ufw allow 143/tcp
 	sudo ufw allow 8530/tcp
 	sudo ufw allow 2812/tcp
+	sudo ufw allow 22507/tcp
 	sudo ufw allow 67
 	sudo ufw allow 68
 	sudo ufw allow 5353
@@ -482,14 +483,18 @@ iptables -A INPUT -i eth0 -p tcp -m state --dport 22 --state NEW -m recent --set
 iptables -A INPUT -i eth0 -p tcp -m state --dport 80 --state NEW -m recent --set
 iptables -A INPUT -i eth0 -p tcp -m state --dport 143 --state NEW -m recent --set
 iptables -A INPUT -i eth0 -p tcp -m state --dport 443 --state NEW -m recent --set
+iptables -A INPUT -i eth0 -p tcp -m state --dport 22507 --state NEW -m recent --set
 iptables -A INPUT -i eth0 -p tcp -m state --dport 22 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
 iptables -A INPUT -i eth0 -p tcp -m state --dport 80 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
 iptables -A INPUT -i eth0 -p tcp -m state --dport 143 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
 iptables -A INPUT -i eth0 -p tcp -m state --dport 443 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
+iptables -A INPUT -i eth0 -p tcp -m state --dport 22507 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
 iptables -t filter -I INPUT -p tcp --syn --dport 80 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
 iptables -t filter -I INPUT -p tcp --syn --dport 22 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
 iptables -t filter -I INPUT -p tcp --syn --dport 143 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
 iptables -t filter -I INPUT -p tcp --syn --dport 443 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
+iptables -t filter -I INPUT -p tcp --syn --dport 22507 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
+
 iptables-save
 sudo apt-get install iptables-persistent
 sudo invoke-rc.d iptables-persistent save
