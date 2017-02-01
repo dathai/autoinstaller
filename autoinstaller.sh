@@ -473,7 +473,7 @@ install_ufw(){
 	sudo ufw allow 68
 	sudo ufw allow 5353
 	sudo ufw allow 1900
-	sudo ufw allow 7300
+	sudo ufw allow 7300/udp
 	sudo ufw disable
 	sudo ufw enable
 iptables -N SSHATTACK
@@ -536,7 +536,7 @@ install_failban(){
 install_badvpn(){
 	clear
 	apt-get -y install cmake make gcc
-	wget https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/file/badvpn-1.999.127.tar.bz2
+	wget https://raw.githubusercontent.com/malikshi/autoinstaller/master/badvpn-1.999.127.tar.bz2
 	tar xf badvpn-1.999.127.tar.bz2
 	mkdir badvpn-build
 	cd badvpn-build
