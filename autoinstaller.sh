@@ -536,20 +536,24 @@ install_failban(){
 install_badvpn(){
 	clear
 	apt-get -y install cmake make gcc
-	wget https://raw.githubusercontent.com/malikshi/autoinstaller/master/badvpn-1.999.127.tar.bz2
-	tar xf badvpn-1.999.127.tar.bz2
+	wget https://raw.githubusercontent.com/malikshi/autoinstaller/master/badvpn-1.999.128.tar.bz2
+	tar xf badvpn-1.999.128.tar.bz2
 	mkdir badvpn-build
 	cd badvpn-build
-	cmake ~/autoinstaller/badvpn-1.999.127 -DBUILD_NOTHING_BY_DEFAULT=1 -DBUILD_UDPGW=1
+	cmake ~/autoinstaller/badvpn-1.999.128 -DBUILD_NOTHING_BY_DEFAULT=1 -DBUILD_UDPGW=1
 	make install
-	echo 'screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &' >> /etc/rc.local
+	echo 'badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/nul &' >> /etc/rc.local
 	echo 'service fail2ban restart' >> /etc/rc.local
 	echo 'sudo /etc/init.d/sslh restart' >> /etc/rc.local
 	echo 'service dropbear restart' >> /etc/rc.local
 	echo 'sudo service squid3 restart' >> /etc/rc.local
 	echo 'service iptables-persistent start' >> /etc/rc.local
 	echo '/etc/init.d/dropbear restart' >> /etc/rc.local
-	screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &
+	badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/nul &
+	cd /usr/bin
+	wget https://raw.githubusercontent.com/malikshi/autoinstaller/master/badvpn-udpgw
+	chmod 755 badvpn-udpgw
+	cd ~/autoinstaller
 	clear
 }
 # install webmin
