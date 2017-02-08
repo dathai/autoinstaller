@@ -494,6 +494,40 @@ iptables -t filter -I INPUT -p tcp --syn --dport 22 -m connlimit --connlimit-abo
 iptables -t filter -I INPUT -p tcp --syn --dport 143 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
 iptables -t filter -I INPUT -p tcp --syn --dport 443 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
 iptables -t filter -I INPUT -p tcp --syn --dport 22507 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
+iptables -A FORWARD -m string --string "BitTorrent" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "BitTorrent protocol" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "peer_id=" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string ".torrent" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "announce.php?passkey=" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "torrent" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "announce" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "info_hash" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "playstation" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "sonyentertainmentnetwork" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "account.sonyentertainmentnetwork.com" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "auth.np.ac.playstation.net" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "auth.api.sonyentertainmentnetwork.com" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -m string --string "auth.api.np.ac.playstation.net" --algo bm --to 65535 -j DROP
+iptables -A FORWARD -p tcp -m tcp --sport 443 -m string --string "playstation" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --sport 143 -m string --string "playstation" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --sport 80 -m string --string "playstation" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --sport 22 -m string --string "playstation" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --sport 22507 -m string --string "playstation" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --sport 443 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --sport 143 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --sport 80 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --sport 22 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --sport 22507 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --dport 443 -m string --string "playstation" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --dport 143 -m string --string "playstation" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --dport 80 -m string --string "playstation" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --dport 22 -m string --string "playstation" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --dport 22507 -m string --string "playstation" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --dport 443 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --dport 143 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --dport 80 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --dport 22 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
+iptables -A FORWARD -p tcp -m tcp --dport 22507 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
 
 iptables-save
 sudo apt-get install iptables-persistent
