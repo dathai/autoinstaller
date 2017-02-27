@@ -584,10 +584,9 @@ install_badvpn(){
 	echo 'service iptables-persistent start' >> /etc/rc.local
 	echo '/etc/init.d/dropbear restart' >> /etc/rc.local
 	badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/nul &
-	# cd /usr/bin
-	# wget https://raw.githubusercontent.com/malikshi/autoinstaller/master/badvpn-udpgw
-	# chmod 755 badvpn-udpgw
-	# cd ~/autoinstaller
+	cd ~/autoinstaller/badvpn-build/udpgw
+	sudo cp badvpn-udpgw /usr/bin/badvpn-udpgw
+	cd ~/autoinstaller
 	clear
 }
 # install webmin
