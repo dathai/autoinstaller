@@ -570,6 +570,7 @@ install_failban(){
 install_badvpn(){
 	clear
 	apt-get -y install cmake make gcc
+	sudo apt-get install libc6-dev
 	wget https://raw.githubusercontent.com/malikshi/autoinstaller/master/badvpn-1.999.128.tar.bz2
 	tar xf badvpn-1.999.128.tar.bz2
 	mkdir badvpn-build
