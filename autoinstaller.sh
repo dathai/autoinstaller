@@ -478,7 +478,6 @@ install_ufw(){
 	sudo ufw enable
 iptables -N SSHATTACK
 iptables -A SSHATTACK -j LOG --log-prefix "Possible SSH attack! " --log-level 7
-iptables -A SSHATTACK -j DROP
 iptables -A INPUT -i eth0 -p tcp -m state --dport 22 --state NEW -m recent --set
 iptables -A INPUT -i eth0 -p tcp -m state --dport 80 --state NEW -m recent --set
 iptables -A INPUT -i eth0 -p tcp -m state --dport 143 --state NEW -m recent --set
@@ -489,46 +488,136 @@ iptables -A INPUT -i eth0 -p tcp -m state --dport 80 --state NEW -m recent --upd
 iptables -A INPUT -i eth0 -p tcp -m state --dport 143 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
 iptables -A INPUT -i eth0 -p tcp -m state --dport 443 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
 iptables -A INPUT -i eth0 -p tcp -m state --dport 22507 --state NEW -m recent --update --seconds 120 --hitcount 4 -j SSHATTACK
-iptables -t filter -I INPUT -p tcp --syn --dport 80 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
-iptables -t filter -I INPUT -p tcp --syn --dport 22 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
-iptables -t filter -I INPUT -p tcp --syn --dport 143 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
-iptables -t filter -I INPUT -p tcp --syn --dport 443 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
-iptables -t filter -I INPUT -p tcp --syn --dport 22507 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
-iptables -A FORWARD -m string --string "BitTorrent" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "BitTorrent protocol" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "peer_id=" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string ".torrent" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "announce.php?passkey=" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "torrent" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "announce" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "info_hash" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "playstation" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "sonyentertainmentnetwork" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "account.sonyentertainmentnetwork.com" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "auth.np.ac.playstation.net" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "auth.api.sonyentertainmentnetwork.com" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -m string --string "auth.api.np.ac.playstation.net" --algo bm --to 65535 -j DROP
-iptables -A FORWARD -p tcp -m tcp --sport 443 -m string --string "playstation" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --sport 143 -m string --string "playstation" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --sport 80 -m string --string "playstation" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --sport 22 -m string --string "playstation" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --sport 22507 -m string --string "playstation" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --sport 443 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --sport 143 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --sport 80 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --sport 22 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --sport 22507 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --dport 443 -m string --string "playstation" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --dport 143 -m string --string "playstation" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --dport 80 -m string --string "playstation" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --dport 22 -m string --string "playstation" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --dport 22507 -m string --string "playstation" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --dport 443 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --dport 143 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --dport 80 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --dport 22 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
-iptables -A FORWARD -p tcp -m tcp --dport 22507 -m string --string "sonyentertainmentnetwork" --algo bm -j DROP
-
+iptables -t filter -I INPUT -p tcp --syn --dport 22 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j SSHATTACK
+iptables -t filter -I INPUT -p tcp --syn --dport 80 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j SSHATTACK
+iptables -t filter -I INPUT -p tcp --syn --dport 143 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j SSHATTACK
+iptables -t filter -I INPUT -p tcp --syn --dport 443 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j SSHATTACK
+iptables -t filter -I INPUT -p tcp --syn --dport 22507 -m connlimit --connlimit-above 2 --connlimit-mask 32 -j SSHATTACK
+iptables -A SSHATTACK -j REJECT
+iptables -N BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'User-Agent: Bittorrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'User-Agent: BitTorrent protocol' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'User-Agent: peer_id=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'User-Agent: .torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'User-Agent: announce.php?passkey=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'User-Agent: Torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'User-Agent: announce' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'User-Agent: info_hash' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'User-Agent: Bittorrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'User-Agent: BitTorrent protocol' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'User-Agent: peer_id=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'User-Agent: .torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'User-Agent: announce.php?passkey=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'User-Agent: Torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'User-Agent: announce' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'User-Agent: info_hash' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'User-Agent: Bittorrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'User-Agent: BitTorrent protocol' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'User-Agent: peer_id=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'User-Agent: .torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'User-Agent: announce.php?passkey=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'User-Agent: Torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'User-Agent: announce' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'User-Agent: info_hash' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'User-Agent: Bittorrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'User-Agent: BitTorrent protocol' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'User-Agent: peer_id=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'User-Agent: .torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'User-Agent: announce.php?passkey=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'User-Agent: Torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'User-Agent: announce' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'User-Agent: info_hash' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'User-Agent: Bittorrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'User-Agent: BitTorrent protocol' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'User-Agent: peer_id=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'User-Agent: .torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'User-Agent: announce.php?passkey=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'User-Agent: Torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'User-Agent: announce' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'User-Agent: info_hash' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'User-Agent: Bittorrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'User-Agent: BitTorrent protocol' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'User-Agent: peer_id=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'User-Agent: .torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'User-Agent: announce.php?passkey=' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'User-Agent: Torrent' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'User-Agent: announce' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'User-Agent: info_hash' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'Host: playstation.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'Host: account.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'Host: auth.api.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'Host: auth.api.np.ac.playstation.net' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 80 -m string --algo bm --string 'Host: sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'Host: playstation.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'Host: account.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'Host: auth.api.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'Host: auth.api.np.ac.playstation.net' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 80 -m string --algo bm --string 'Host: sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'Host: playstation.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'Host: account.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'Host: auth.api.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'Host: auth.api.np.ac.playstation.net' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 22 -m string --algo bm --string 'Host: sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'Host: playstation.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'Host: account.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'Host: auth.api.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'Host: auth.api.np.ac.playstation.net' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 22 -m string --algo bm --string 'Host: sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'Host: playstation.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'Host: account.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'Host: auth.api.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'Host: auth.api.np.ac.playstation.net' -j BLOCKACCESS
+iptables -I INPUT -p tcp --sport 443 -m string --algo bm --string 'Host: sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'Host: playstation.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'Host: account.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'Host: auth.api.sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'Host: auth.api.np.ac.playstation.net' -j BLOCKACCESS
+iptables -I INPUT -p tcp --dport 443 -m string --algo bm --string 'Host: sonyentertainmentnetwork.com' -j BLOCKACCESS
+iptables -A BLOCKACCESS -j DROP
+iptables -N BLOCKS
+iptables -I INPUT -m string --algo bm --string 'BitTorrent' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'BitTorrent' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'BitTorrent' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'BitTorrent protocol' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'BitTorrent protocol' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'BitTorrent protocol' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'peer_id=' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'peer_id=' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'peer_id=' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string '.torrent' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string '.torrent' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string '.torrent' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'announce.php?passkey=' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'announce.php?passkey=' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'announce.php?passkey=' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'torrent' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'torrent' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'torrent' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'announce' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'announce' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'announce' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'info_hash' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'info_hash' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'info_hash' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'playstation' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'playstation' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'playstation' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'sonyentertainmentnetwork' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'sonyentertainmentnetwork' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'sonyentertainmentnetwork' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'account.sonyentertainmentnetwork.com' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'account.sonyentertainmentnetwork.com' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'account.sonyentertainmentnetwork.com' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'auth.np.ac.playstation.net' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'auth.np.ac.playstation.net' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'auth.np.ac.playstation.net' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'auth.api.sonyentertainmentnetwork.com' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'auth.api.sonyentertainmentnetwork.com' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'auth.api.sonyentertainmentnetwork.com' -j BLOCKS
+iptables -I INPUT -m string --algo bm --string 'auth.api.np.ac.playstation.ne' -j BLOCKS
+iptables -I OUTPUT -m string --algo bm --string 'auth.api.np.ac.playstation.ne' -j BLOCKS
+iptables -I FORWARD -m string --algo bm --string 'auth.api.np.ac.playstation.ne' -j BLOCKS
+iptables -A BLOCKS -j DROP
 iptables-save
 sudo apt-get install iptables-persistent
 sudo invoke-rc.d iptables-persistent save
