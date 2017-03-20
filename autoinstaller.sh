@@ -360,7 +360,7 @@ install_monit(){
 # Install openvpn
 install_openvpn(){
     clear
-	sudo apt-get install openvpn easy-rsa
+	apt-get install openvpn easy-rsa
 	make-cadir ~/openvpn-ca && cd ~/openvpn-ca
 	mv ~/autoinstaller/vars ~/openvpn-ca/vars
 	source vars && ./clean-all && ./build-ca &&./build-key-server server && ./build-dh
@@ -368,7 +368,7 @@ install_openvpn(){
 	source vars
 	./build-key client1
 	cd ~/openvpn-ca/keys
-	sudo cp ca.crt ca.key server.crt server.key ta.key dh2048.pem /etc/openvpn
+	cp ca.crt ca.key server.crt server.key ta.key dh2048.pem /etc/openvpn
 	mv ~/autoinstaller/server.conf /etc/openvpn/
 	mv ~/autoinstaller/server-udp.conf /etc/openvpn/
 	# Error PLEASE MANUAL Config
@@ -428,6 +428,8 @@ echo 'net.core.netdev_max_backlog = 30000' >>/etc/sysctl.conf
 echo 'net.ipv4.tcp_mtu_probing=1' >>/etc/sysctl.conf
 echo 'net.ipv4.tcp_fastopen=3' >>/etc/sysctl.conf
 echo 'net.ipv4.tcp_congestion_control=hybla' >>/etc/sysctl.conf
+echo 'vm.swappiness= 40' >>/etc/sysctl.conf
+echo 'vm.vfs_cache_pressure = 50' >>/etc/sysctl.conf
 	sysctl -p
 	ulimit -n 51200
 	cat /etc/sysctl.d/30-tcp_fastopen.conf
@@ -440,6 +442,11 @@ echo 'net.ipv4.tcp_congestion_control=hybla' >>/etc/sysctl.conf
 	fi
 	ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 	mv ~/autoinstaller/issue.net /etc/issue.net
+	fallocate -l 2G /swapfile
+	chmod 600 /swapfile
+	mkswap /swapfile
+	swapon /swapfile
+	echo '/swapfile none swap sw 0 0' >>/etc/fstab
 	clear
 
 }
@@ -449,33 +456,33 @@ install_squid(){
 	apt-get install squid
 	apt-get install squid3
 	mv ~/autoinstaller/squid.conf /etc/squid3/squid.conf
-	sudo service squid3 restart
+	service squid3 restart
 	clear
 }
 # install ufw
 install_ufw(){
     clear
-	sudo apt-get update && apt-get install ufw
-	sudo ufw allow OpenSSH
-	sudo ufw allow 53/udp
-	sudo ufw allow 636/tcp
-	sudo ufw allow 443/tcp
-	sudo ufw allow 10000/tcp
-	sudo ufw allow 80/tcp
-	sudo ufw allow 8080/tcp
-	sudo ufw allow 3128/tcp
-	sudo ufw allow 27015/udp
-	sudo ufw allow 143/tcp
-	sudo ufw allow 8530/tcp
-	sudo ufw allow 2812/tcp
-	sudo ufw allow 22507/tcp
-	sudo ufw allow 67
-	sudo ufw allow 68
-	sudo ufw allow 5353
-	sudo ufw allow 1900
-	sudo ufw allow 7300/udp
-	sudo ufw disable
-	sudo ufw enable
+	apt-get update && apt-get install ufw
+	ufw allow OpenSSH
+	ufw allow 53/udp
+	ufw allow 636/tcp
+	ufw allow 443/tcp
+	ufw allow 10000/tcp
+	ufw allow 80/tcp
+	ufw allow 8080/tcp
+	ufw allow 3128/tcp
+	ufw allow 27015/udp
+	ufw allow 143/tcp
+	ufw allow 8530/tcp
+	ufw allow 2812/tcp
+	ufw allow 22507/tcp
+	ufw allow 67
+	ufw allow 68
+	ufw allow 5353
+	ufw allow 1900
+	ufw allow 7300/udp
+	ufw disable
+	ufw enable
 iptables -N SSHATTACK
 iptables -A SSHATTACK -j LOG --log-prefix "Possible SSH attack! " --log-level 7
 iptables -A INPUT -i eth0 -p tcp -m state --dport 22 --state NEW -m recent --set
@@ -619,8 +626,8 @@ iptables -I OUTPUT -m string --algo bm --string 'auth.api.np.ac.playstation.ne' 
 iptables -I FORWARD -m string --algo bm --string 'auth.api.np.ac.playstation.ne' -j BLOCKS
 iptables -A BLOCKS -j DROP
 iptables-save
-sudo apt-get install iptables-persistent
-sudo invoke-rc.d iptables-persistent save
+apt-get install iptables-persistent
+invoke-rc.d iptables-persistent save
 clear
 }
 
@@ -642,9 +649,9 @@ install_dropbear(){
 install_sslh(){
     clear
 	apt-get update
-	sudo apt-get install sslh
+	apt-get install sslh
 	mv ~/autoinstaller/sslh /etc/default/sslh
-	sudo /etc/init.d/sslh restart
+	/etc/init.d/sslh restart
 	clear
 }
 # install failban
@@ -658,8 +665,7 @@ install_failban(){
 # install badvpn
 install_badvpn(){
 	clear
-	apt-get -y install cmake make gcc
-	sudo apt-get install libc6-dev
+	apt-get -y install cmake make gcc libc6-dev
 	wget https://raw.githubusercontent.com/malikshi/autoinstaller/master/badvpn-1.999.128.tar.bz2
 	tar xf badvpn-1.999.128.tar.bz2
 	mkdir badvpn-build
@@ -686,9 +692,9 @@ install_webmin(){
 	apt-get update
 	echo 'deb http://download.webmin.com/download/repository sarge contrib' >>/etc/apt/sources.list
 	echo 'deb http://webmin.mirror.somersettechsolutions.co.uk/repository sarge contrib' >>/etc/apt/sources.list
-	sudo wget http://www.webmin.com/jcameron-key.asc
-	sudo apt-key add jcameron-key.asc
-	sudo apt-get update && sudo apt-get install webmin
+	wget http://www.webmin.com/jcameron-key.asc
+	apt-key add jcameron-key.asc
+	apt-get update && sudo apt-get install webmin
 
 }
 # Initialization step
