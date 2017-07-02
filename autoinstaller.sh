@@ -466,6 +466,7 @@ install_ufw(){
 	ufw allow OpenSSH
 	ufw allow 53/udp
 	ufw allow 636/tcp
+	ufw allow 1194/tcp
 	ufw allow 443/tcp
 	ufw allow 10000/tcp
 	ufw allow 80/tcp
