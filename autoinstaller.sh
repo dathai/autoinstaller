@@ -403,10 +403,10 @@ echo '* soft nofile 51200' >> /etc/security/limits.conf
 echo '* hard nofile 51200' >> /etc/security/limits.conf
 echo '* hard nproc 2' >> /etc/security/limits.conf
 echo '* hard maxlogins 2' >> /etc/security/limits.conf
-echo 'net.ipv4.ip_forward = 1' >>/etc/sysctl.conf
-echo 'net.ipv4.conf.default.rp_filter = 1' >>/etc/sysctl.conf
+#echo 'net.ipv4.ip_forward = 1' >>/etc/sysctl.conf
+#echo 'net.ipv4.conf.default.rp_filter = 1' >>/etc/sysctl.conf
 #echo 'net.ipv4.conf.default.accept_source_route = 0' >>/etc/sysctl.conf
-echo 'net.ipv4.tcp_syncookies = 1' >>/etc/sysctl.conf
+#echo 'net.ipv4.tcp_syncookies = 1' >>/etc/sysctl.conf
 echo 'kernel.msgmnb = 65536' >>/etc/sysctl.conf
 echo 'kernel.msgmax = 65536' >>/etc/sysctl.conf
 echo 'kernel.shmmax = 4294967295' >>/etc/sysctl.conf
