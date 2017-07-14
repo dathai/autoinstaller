@@ -399,8 +399,8 @@ install_fasttcp(){
     clear
 echo "3" > /proc/sys/net/ipv4/tcp_fastopen
 echo "net.ipv4.tcp_fastopen=3" > /etc/sysctl.d/30-tcp_fastopen.conf
-	echo '* soft nofile 51200' >> /etc/security/limits.conf
-	echo '* hard nofile 51200' >> /etc/security/limits.conf
+echo '* soft nofile 51200' >> /etc/security/limits.conf
+echo '* hard nofile 51200' >> /etc/security/limits.conf
 echo '* hard nproc 2' >> /etc/security/limits.conf
 echo '* hard maxlogins 2' >> /etc/security/limits.conf
 echo 'net.ipv4.ip_forward = 1' >>/etc/sysctl.conf
@@ -436,10 +436,6 @@ echo 'vm.vfs_cache_pressure = 50' >>/etc/sysctl.conf
 	/sbin/modprobe tcp_hybla
 	sysctl net.ipv4.tcp_available_congestion_control
 	sysctl net.ipv4.tcp_fastopen
-	sed -i '/\<DEFAULT_FORWARD_POLICY\>/c\DEFAULT_FORWARD_POLICY="ACCEPT"' /etc/default/ufw
-	if ! grep -q "\<DEFAULT_FORWARD_POLICY\>" /etc/default/ufw; then
-		 echo 'DEFAULT_FORWARD_POLICY="ACCEPT"' >> /etc/default/ufw
-	fi
 	ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 	mv ~/autoinstaller/issue.net /etc/issue.net
 	fallocate -l 2G /swapfile
