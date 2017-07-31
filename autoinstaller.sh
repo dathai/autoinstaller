@@ -460,6 +460,7 @@ install_ufw(){
     clear
 	apt-get update && apt-get install ufw
 	ufw allow OpenSSH
+	ufw allow 222/tcp
 	ufw allow 636/tcp
 	ufw allow 1194/tcp
 	ufw allow 443/tcp
