@@ -436,7 +436,6 @@ echo 'vm.vfs_cache_pressure = 50' >>/etc/sysctl.conf
 	/sbin/modprobe tcp_hybla
 	sysctl net.ipv4.tcp_available_congestion_control
 	sysctl net.ipv4.tcp_fastopen
-	ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 	mv ~/autoinstaller/issue.net /etc/issue.net
 	fallocate -l 2G /swapfile
 	chmod 600 /swapfile
